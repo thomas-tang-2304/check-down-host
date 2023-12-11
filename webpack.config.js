@@ -4,7 +4,7 @@ module.exports = {
   mode: 'production',
   devtool: 'source-map',
   target: "node",
-  entry: "./list_domain.js",
+  entry: "./dos.js",
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),

@@ -1,4 +1,4 @@
-const { configEnv } = require("./src/configEnv");
+const { configEnv } = require("./configEnv");
 const { OAuth2Client } = require("google-auth-library");
 const nodemailer = require("nodemailer");
 configEnv();

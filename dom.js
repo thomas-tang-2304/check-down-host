@@ -44,6 +44,7 @@ web_array.forEach((url) => {
   let data = JSON.stringify({
     email: "hongtang240@gmail.com",
     url: url,
+    uid_socket: "-uL2jMQrCQOADtcNAAAB",
   });
   let config = {
     method: "post",

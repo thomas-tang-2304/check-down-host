@@ -21,8 +21,8 @@ const mapParentIndex = (objArray, queue) => {
 
 const mapParentLink = (indexArray, refArray) => {
   return indexArray
-    .map((queueLink) => refArray[queueLink])
-    .map((link) => link.url);
+    ?.map((queueLink) => refArray[queueLink])
+    ?.map((link) => link.url);
 };
 
 const filterOriginStatics = (jsonArray) => ({

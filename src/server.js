@@ -8,14 +8,13 @@ const socketIo = require("socket.io");
 
 const { configEnv } = require("./configEnv");
 const { mapParentLink } = require("./crawl/cheerio/utils");
-const {createRealtime} = require("./io")
+const { createRealtime } = require("./io");
 
 configEnv();
 
 // Routers
 const emailRouter = require("./routes/gmail/send_mail_router");
 const { readFileHistory } = require("./crawl/modules/readFileHistory");
-
 
 const app = express();
 const server = http.Server(app);
@@ -47,11 +46,10 @@ app.post("/find", async function (req, res) {
   const keyContainsTargetInSrc = allHref.src_links.filter((value) =>
     value?.url.includes(target)
   );
-  const keyContainsTargetInHref = allHref.href_links.filter(
-    (value) => value?.url.includes(target)
+  const keyContainsTargetInHref = allHref.href_links.filter((value) =>
+    value?.url.includes(target)
   );
 
-  
   const result = {
     src: keyContainsTargetInSrc.map((key) => ({
       ...key,
@@ -63,10 +61,7 @@ app.post("/find", async function (req, res) {
     })),
   };
   // console.log(result);
-  if (
-
-    result
-  ) {
+  if (result) {
     res.status(200).send({
       data: result,
     });
@@ -75,8 +70,6 @@ app.post("/find", async function (req, res) {
   }
 });
 
-
 server.listen(process.env.PORT, () => {
   console.log(`Server listening on Port ${process.env.PORT}`);
-  
 });

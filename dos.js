@@ -27,7 +27,7 @@ const fetchIP = (url, hostIP, current_status, email) =>
     })
     .then((data) => {
       if (current_status == false) {
-        list_domain[count].email.forEach(async (emailAdd) => {
+        email.forEach(async (emailAdd) => {
           await sendEmail({
             email: emailAdd,
             hostIP,

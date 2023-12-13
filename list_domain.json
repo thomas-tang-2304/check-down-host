@@ -54,12 +54,12 @@
   {
     "url": "http://phongkhamdakhoatiengiang.vn",
     "hostIP": "103.63.212.20",
-    "email": ["hongtang240@gmail.com", "khang890416@gmail.com","hongtang240@gmail.com", "khang890416@gmail.com"]
+    "email": ["hongtang240@gmail.com"]
   },
   {
     "url": "http://phongkhamdakhoadaklak.vn",
     "hostIP": "103.63.215.49",
-    "email": ["hongtang240@gmail.com", "khang890416@gmail.com","hongtang240@gmail.com", "khang890416@gmail.com"]
+    "email": ["hongtang240@gmail.com"]
   },
   {
     "url": "http://dakhoaaua.vn",
@@ -131,11 +131,7 @@
     "hostIP": "103.82.37.222",
     "email": ["hongtang240@gmail.com", "khang890416@gmail.com","tranthientann@gmail.com"]
   },
-  {
-    "url": "http://phongkhamdakhoataynguyen.vn",
-    "hostIP": "103.82.133.134",
-    "email": ["hongtang240@gmail.com", "khang890416@gmail.com","laihphuong@gmail.com"]
-  },
+ 
   {
     "url": "http://dakhoahoancau.vn",
     "hostIP": "103.63.215.61",

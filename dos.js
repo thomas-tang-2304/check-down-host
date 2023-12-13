@@ -1,10 +1,9 @@
-const { configEnv } = require("./configEnv");
-const { OAuth2Client } = require("google-auth-library");
-const nodemailer = require("nodemailer");
+import { configEnv } from "./configEnv.js";
+import { OAuth2Client } from "google-auth-library";
+import nodemailer from "nodemailer";
 configEnv();
 
-const { writeFileSync } = require("fs");
-let count = 0;
+import { writeFileSync, writeFile } from "fs";
 
 // Khởi tạo OAuth2Client với Client ID và Client Secret
 const myOAuth2Client = new OAuth2Client(
@@ -20,56 +19,44 @@ const fetchIP = (url, hostIP, current_status, email) =>
   fetch(url)
     .then(async (response) => {
       if (!response.ok) {
-        // Status code is not 200 (e.g., 404, 500, etc.)
-        // Simulating sending an email here (replace this with your email sending logic)
-        email.forEach(async (emailAdd) => {
-          await sendEmail({
-            email: emailAdd,
-            hostIP,
-            status: "Not ok",
-            url,
-            body: `was downed`,
-          });
-        });
+        console.log(response.status);
+        throw new Error(false);
       } else {
-        // await sendEmail({
-        //   email: "hongtang240@gmail.com",
-        //   status: "ok",
-        // });
         return response;
       }
     })
     .then((data) => {
-      //   if (data) {
-      //     console.log("IP address:", data.ip);
-      //     console.log(
-      //       "Location:",
-      //       data.city + ", " + data.region + ", " + data.country
-      //     );
-      //     console.log("ISP:", data.org);
-      //     console.log("Hostname:", data.hostname);
-      //     // You can access more details available in the 'data' object
-      //   }
-      //   console.log(data);
-      return {
-        status: "ok",
-      };
-    })
-    .catch(async (error) => {
-      console.error("Error fetching IP information:", error);
-      if (current_status == "ok" || !current_status) {
-        email.forEach(async (emailAdd) => {
+      if (current_status == false) {
+        list_domain[count].email.forEach(async (emailAdd) => {
           await sendEmail({
             email: emailAdd,
             hostIP,
-            status: "Not ok",
+            status: true,
             url,
-            body: `was downed`,
+            body: `is working`,
           });
         });
       }
       return {
-        status: "Not ok",
+        status: true,
+      };
+    })
+    .catch(async (error) => {
+      console.error("Error fetching IP information:", error);
+      if (current_status == true) {
+        email.forEach(async (emailAdd) => {
+          await sendEmail({
+            email: emailAdd,
+            hostIP,
+            status: false,
+            url,
+            body: `was downed`,
+          });
+        });
+        // console.log("Gửi mail web DOWN");
+      }
+      return {
+        status: false,
       };
     });
 
@@ -78,8 +65,15 @@ async function sendEmail(req) {
   const { email, status, hostIP, url, body } = req;
   try {
     // Lấy thông tin gửi lên từ client qua body
-    console.log({ email, status, hostIP });
-    if (!email || !status || !hostIP || !url)
+    console.log({ email, status, hostIP, url, body });
+    if (
+      !email ||
+      status == null ||
+      status == undefined ||
+      !hostIP ||
+      !url ||
+      !body
+    )
       throw new Error("Please provide email, host IP and code status!");
     const htmlResult = status;
 
@@ -127,49 +121,93 @@ async function sendEmail(req) {
     console.log({ errors: error.message });
   }
 }
+import list_domain_json from "./list_domain.json" assert { type: "json" };
+import list_domain_checked_json from "./list_domain_checked.json" assert { type: "json" };
 
-let list_domain = require("./list_domain.json").map((domain) => ({
+let list_domain = list_domain_json.map((domain) => ({
   ...domain,
   url: domain.url.trim(),
 }));
+let list_domain_checked = list_domain_checked_json.map((domain) => ({
+  ...domain,
+  url: domain.url.trim(),
+}));
+
 async function cycleArray() {
-  const current_status = (
-    await fetchIP(
-      list_domain[count].url.trim(),
-      list_domain[count].hostIP,
-      list_domain[count].status,
-      list_domain[count].email
-    )
-  ).status;
-  if (
-    (current_status != list_domain[count].status && current_status == "ok") ||
-    !list_domain[count].status
-  ) {
-    list_domain[count].email.forEach(async (emailAdd) => {
-      await sendEmail({
-        email: emailAdd,
-        hostIP: list_domain[count].hostIP,
-        status: "ok",
+  let count = 0;
+  while (count < list_domain.length) {
+    let list_domain_checked_index = list_domain_checked.findIndex(
+      (domain) => domain.url == list_domain[count]?.url.trim()
+    );
+
+    const current_status = (
+      await fetchIP(
+        list_domain[count]?.url.trim(),
+        list_domain[count]?.hostIP,
+        list_domain_checked[list_domain_checked_index]?.status,
+        list_domain[count]?.email
+      )
+    ).status;
+    console.log(
+      "Last Status:",
+      list_domain_checked[list_domain_checked_index]?.status
+    );
+    if (
+      list_domain_checked.filter(
+        (domain) => domain.url == list_domain[count].url.trim()
+      ).length > 0 &&
+      list_domain_checked[list_domain_checked_index]
+    ) {
+      list_domain_checked[list_domain_checked_index].status = current_status;
+    } else {
+      list_domain_checked.push({
         url: list_domain[count].url.trim(),
-        body: `is working`,
+        hostIP: list_domain[count].hostIP,
+        status: current_status,
       });
-    });
-  }
-  list_domain[count].status = current_status;
-  console.log("Job Status:", list_domain[count].status);
-  console.log(list_domain[count].url.trim());
-  list_domain = [...list_domain];
-  writeFileSync("list_domain.json", JSON.stringify(list_domain), "utf-8");
+    }
+    console.log("Job Status:", current_status);
+    console.log(list_domain[count].url.trim());
+    await writeFile(
+      "list_domain_checked.json",
+      JSON.stringify(list_domain_checked),
+      "utf-8",
+      () => {
+        console.log("Finished");
+      }
+    );
 
-  // increment our counter
-  count++;
+    console.log("--------------------------------------------");
 
-  // reset counter if we reach end of array
-  if (count === list_domain.length) {
-    count = 0;
+    // increment our counter
+    count++;
+
+    // // reset counter if we reach end of array
+    // if (count === list_domain.length) {
+    //   count = 0;
+    // }
   }
 }
+const delay = (delayInms) => {
+  return new Promise((resolve) => setTimeout(resolve, delayInms));
+};
 
-setInterval(() => {
-  cycleArray();
-}, 0.5 * 60 * 1000);
+import express from "express";
+const app = express();
+const port = 8080;
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
+
+import schedule from "node-schedule";
+
+schedule.scheduleJob("*/3 * * * *", function () {
+  const date = new Date();
+  console.log(date);
+  (async () => {
+    await cycleArray();
+  })();
+});

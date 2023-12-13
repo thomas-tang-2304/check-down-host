@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "crawl": "node crawl/index",
@@ -36,6 +37,7 @@
     "googleapis": "^105.0.0",
     "http": "^0.0.1-security",
     "https": "^1.0.0",
+    "node-schedule": "^2.1.1",
     "nodemailer": "^6.9.7",
     "nodemon": "^3.0.1",
     "os": "^0.1.2",

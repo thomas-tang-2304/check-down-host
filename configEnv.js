@@ -1,8 +1,8 @@
-const { config } = require("dotenv");
+import { config } from "dotenv";
 
 const nodeEnv = process.env.NODE_ENV || "";
 
-const configEnv = () => {
+export const configEnv = () => {
   if (nodeEnv) {
     config({
       path: `./.env.production`,
@@ -11,6 +11,3 @@ const configEnv = () => {
     config();
   }
 };
-
-
-module.exports = { configEnv };
